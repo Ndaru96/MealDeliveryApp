@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CourierService.Models
+namespace OrderService.Models
 {
     public partial class User
     {

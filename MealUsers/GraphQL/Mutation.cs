@@ -147,6 +147,58 @@ namespace UserService.GraphQL
 
         }
 
+        [Authorize(Roles = new[] { "ADMIN" })]
+        public async Task<User> DeleteUserByIdAsync(
+           int id,
+           [Service] MealAppContext context)
+        {
+            var product = context.Users.Where(o => o.Id == id).FirstOrDefault();
+            if (product != null)
+            {
+                context.Users.Remove(product);
+                await context.SaveChangesAsync();
+            }
+
+
+            return await Task.FromResult(product);
+        }
+
+        [Authorize(Roles = new[] {"ADMIN"})]
+        public async Task<UserRoleData> AddUserRoleAsync(
+           UserRoleInput input,
+           [Service] MealAppContext context)
+        {
+            var userrole = context.UserRoles.Where(o => o.Id == input.Id).FirstOrDefault();
+            if (userrole != null)
+            {
+                return await Task.FromResult(new UserRoleData());
+            }
+
+            var newUserRole = new UserRole
+            {
+                UserId = input.UserId,
+                RoleId = input.RoleId
+               
+            };
+
+            var ret = context.UserRoles.Add(newUserRole);
+            await context.SaveChangesAsync();
+
+            return await Task.FromResult(new UserRoleData
+            {
+                Id = newUserRole.Id,
+                UserId = newUserRole.UserId,
+                RoleId = newUserRole.RoleId
+            });
+
+
+
+
+
+        }
+
+
+
 
     }
 }

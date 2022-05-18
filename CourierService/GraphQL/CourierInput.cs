@@ -4,7 +4,8 @@
         (
             int? Id,
             string Name,
-            int Cost
+            string Phone,
+            int UserId
         );
     
 }

@@ -10,15 +10,12 @@ namespace CourierService.GraphQL
           CourierInput input,
           [Service] MealAppContext context)
         {
-            var courier = context.Couriers.Where(o => o.Id == input.Id).FirstOrDefault();
-            if (courier != null)
-            {
-                return await Task.FromResult(new CourierData());
-            }
             var newCourier = new Courier
             {
+                UserId = input.UserId,
                 Name = input.Name,
-                Cost = input.Cost
+                Phone = input.Phone
+               
                
             };
 
@@ -30,9 +27,9 @@ namespace CourierService.GraphQL
             {
                 Id = newCourier.Id,
                 Name = newCourier.Name,
-                Cost = newCourier.Cost
-                
-            });
+                Phone = newCourier.Phone,
+                UserId = newCourier.UserId
+            }) ;
         }
 
         [Authorize(Roles = new[] { "MANAGER" })]
@@ -43,8 +40,10 @@ namespace CourierService.GraphQL
             var courier = context.Couriers.Where(o => o.Id == input.Id).FirstOrDefault();
             if (courier != null)
             {
+                courier.UserId = input.UserId;
                 courier.Name = input.Name;
-                courier.Cost = input.Cost;
+                courier.Phone = input.Phone;
+               
 
                 context.Couriers.Update(courier);
                 await context.SaveChangesAsync();

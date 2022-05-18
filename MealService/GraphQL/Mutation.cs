@@ -54,5 +54,21 @@ namespace MealService.GraphQL
 
             return await Task.FromResult(meal);
         }
+
+        [Authorize(Roles = new[] { "MANAGER" })]
+        public async Task<Meal> DeleteMealByIdAsync(
+           int id,
+           [Service] MealAppContext context)
+        {
+            var meal = context.Meals.Where(o => o.Id == id).FirstOrDefault();
+            if (meal != null)
+            {
+                context.Meals.Remove(meal);
+                await context.SaveChangesAsync();
+            }
+
+
+            return await Task.FromResult(meal);
+        }
     }
 }

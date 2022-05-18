@@ -2,9 +2,11 @@
 {
     public record UpdateCourier
         (
-            int Id,
+            int? Id,
             string Name,
-            int Cost
+            string Phone,
+            int UserId
+
         );
     
 }

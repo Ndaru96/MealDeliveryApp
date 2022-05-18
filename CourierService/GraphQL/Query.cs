@@ -27,5 +27,24 @@ namespace CourierService.GraphQL
 
             return new List<Courier>().AsQueryable();
         }
+
+        [Authorize(Roles = new[] { "MANAGER" })]// dapat diakses kalau sudah login
+        public IQueryable<Courier> GetCourierByUserId(
+           int id, [Service] MealAppContext context)
+        {
+            // check admin role ?
+
+            var user = context.Couriers.Where(o => o.UserId == id).FirstOrDefault();
+            if (user != null)
+
+            {
+                return context.Couriers.Where(o => o.UserId == id);
+
+            }
+
+
+
+            return new List<Courier>().AsQueryable();
+        }
     }
 }

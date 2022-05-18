@@ -18,6 +18,8 @@ namespace UserService.Models
 
         public virtual DbSet<Courier> Couriers { get; set; } = null!;
         public virtual DbSet<Meal> Meals { get; set; } = null!;
+        public virtual DbSet<Order> Orders { get; set; } = null!;
+        public virtual DbSet<OrderDetail> OrderDetails { get; set; } = null!;
         public virtual DbSet<Profile> Profiles { get; set; } = null!;
         public virtual DbSet<Role> Roles { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
@@ -39,6 +41,14 @@ namespace UserService.Models
                 entity.ToTable("Courier");
 
                 entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.Phone).HasMaxLength(50);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Couriers)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Courier_User1");
             });
 
             modelBuilder.Entity<Meal>(entity =>
@@ -46,6 +56,42 @@ namespace UserService.Models
                 entity.ToTable("Meal");
 
                 entity.Property(e => e.Name).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.ToTable("Order");
+
+                entity.Property(e => e.Code).HasMaxLength(50);
+
+                entity.HasOne(d => d.Courier)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.CourierId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Order_Courier");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Order_User");
+            });
+
+            modelBuilder.Entity<OrderDetail>(entity =>
+            {
+                entity.ToTable("OrderDetail");
+
+                entity.HasOne(d => d.Meal)
+                    .WithMany(p => p.OrderDetails)
+                    .HasForeignKey(d => d.MealId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrderDetail_Meal");
+
+                entity.HasOne(d => d.Order)
+                    .WithMany(p => p.OrderDetails)
+                    .HasForeignKey(d => d.OrderId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_OrderDetail_Order");
             });
 
             modelBuilder.Entity<Profile>(entity =>
@@ -75,6 +121,8 @@ namespace UserService.Models
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("User");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Fullname).HasMaxLength(50);
 
