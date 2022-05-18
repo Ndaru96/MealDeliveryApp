@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace UserService.Models
+namespace MealService.Models
 {
     public partial class MealAppContext : DbContext
     {

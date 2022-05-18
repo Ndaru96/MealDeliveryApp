@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UserService.Models
+namespace CourierService.Models
 {
     public partial class Profile
     {

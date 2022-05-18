@@ -1,14 +1,14 @@
 ﻿using HotChocolate.AspNetCore.Authorization;
+using MealService.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using UserService.Models;
 
-namespace UserService.GraphQL
+namespace MealService.GraphQL
 {
     public class Query
     {
         [Authorize] // dapat diakses kalau sudah login
-        public IQueryable<User> GetUsers([Service] MealAppContext context, ClaimsPrincipal claimsPrincipal)
+        public IQueryable<Meal> GetMeals([Service] MealAppContext context, ClaimsPrincipal claimsPrincipal)
         {
             var userName = claimsPrincipal.Identity.Name;
 
@@ -17,17 +17,16 @@ namespace UserService.GraphQL
             var user = context.Users.Where(o => o.Username == userName).FirstOrDefault();
             if (user != null)
             {
-                if (adminRole.Value == "ADMIN")
+                if (adminRole.Value == "BUYER" || adminRole.Value == "MANAGER")
                 {
-                    return context.Users.Include(p => p.Profiles);
+                    return context.Meals;
                 }
-                var orders = context.Users.Where(o => o.Id == user.Id).Include(s => s.Profiles);
-                return orders.AsQueryable();
+               
 
             }
 
 
-            return new List<User>().AsQueryable();
+            return new List<Meal>().AsQueryable();
         }
     }
 }
