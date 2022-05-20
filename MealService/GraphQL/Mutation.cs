@@ -8,7 +8,7 @@ namespace MealService.GraphQL
         [Authorize(Roles = new[] { "MANAGER" })]
         public async Task<MealData> AddMealAsync(
            MealInput input,
-           [Service] MealAppContext context)
+           [Service] MealDeliveryContext context)
         {
             var meal = context.Meals.Where(o => o.Id == input.Id).FirstOrDefault();
             if (meal != null)
@@ -38,7 +38,7 @@ namespace MealService.GraphQL
         [Authorize(Roles = new[] { "MANAGER" })]
         public async Task<Meal> UpdateMealAsync(
             UpdateMeal input,
-            [Service] MealAppContext context)
+            [Service] MealDeliveryContext context)
         {
             var meal = context.Meals.Where(o => o.Id == input.Id).FirstOrDefault();
             if (meal != null)
@@ -58,7 +58,7 @@ namespace MealService.GraphQL
         [Authorize(Roles = new[] { "MANAGER" })]
         public async Task<Meal> DeleteMealByIdAsync(
            int id,
-           [Service] MealAppContext context)
+           [Service] MealDeliveryContext context)
         {
             var meal = context.Meals.Where(o => o.Id == id).FirstOrDefault();
             if (meal != null)

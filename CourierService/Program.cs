@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using CourierService.GraphQL;
+
 using CourierService.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,8 +15,8 @@ builder.Services.AddDbContext<MealAppContext>(options =>
 // graphql
 builder.Services
     .AddGraphQLServer()
-    .AddQueryType<Query>()
-    .AddMutationType<Mutation>()
+    //.AddQueryType<Query>()
+    //.AddMutationType<Mutation>()
     .AddAuthorization();
 
 builder.Services.AddControllers();

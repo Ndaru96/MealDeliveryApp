@@ -13,7 +13,7 @@ namespace OrderService.Models
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public int Stock { get; set; }
-        public int Price { get; set; }
+        public double Price { get; set; }
 
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
     }

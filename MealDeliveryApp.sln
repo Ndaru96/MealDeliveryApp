@@ -7,9 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserService", "MealUsers\Us
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MealService", "MealService\MealService.csproj", "{701CFD7F-4D6C-40FC-A153-BC9770C533BA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CourierService", "CourierService\CourierService.csproj", "{BDE4C131-D52D-4974-BB97-7B41C9431CAA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService", "OrderService\OrderService.csproj", "{020819F3-A27B-43D3-8756-A032D6C10DA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderService", "OrderService\OrderService.csproj", "{020819F3-A27B-43D3-8756-A032D6C10DA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +23,6 @@ Global
 		{701CFD7F-4D6C-40FC-A153-BC9770C533BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{701CFD7F-4D6C-40FC-A153-BC9770C533BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{701CFD7F-4D6C-40FC-A153-BC9770C533BA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BDE4C131-D52D-4974-BB97-7B41C9431CAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDE4C131-D52D-4974-BB97-7B41C9431CAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDE4C131-D52D-4974-BB97-7B41C9431CAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDE4C131-D52D-4974-BB97-7B41C9431CAA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{020819F3-A27B-43D3-8756-A032D6C10DA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{020819F3-A27B-43D3-8756-A032D6C10DA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{020819F3-A27B-43D3-8756-A032D6C10DA4}.Release|Any CPU.ActiveCfg = Release|Any CPU

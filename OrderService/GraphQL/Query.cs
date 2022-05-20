@@ -8,7 +8,7 @@ namespace OrderService.GraphQL
     public class Query
     {
         [Authorize] // dapat diakses kalau sudah login
-        public IQueryable<Order> GetOrders([Service] MealAppContext context, ClaimsPrincipal claimsPrincipal)
+        public IQueryable<Order> GetOrders([Service] MealDeliveryContext context, ClaimsPrincipal claimsPrincipal)
         {
             var userName = claimsPrincipal.Identity.Name;
 
@@ -17,7 +17,7 @@ namespace OrderService.GraphQL
             var user = context.Users.Where(o => o.Username == userName).FirstOrDefault();
             if (user != null)
             {
-                if (adminRole.Value == "MANAGER")
+                if (adminRole.Value == "BUYER")
                 {
                     return context.Orders.Include(p => p.OrderDetails);
                 }

@@ -8,7 +8,7 @@ using UserService.GraphQL;
 var builder = WebApplication.CreateBuilder(args);
 
 var conString = builder.Configuration.GetConnectionString("MyDatabase");
-builder.Services.AddDbContext<MealAppContext>(options =>
+builder.Services.AddDbContext<MealDeliveryContext>(options =>
      options.UseSqlServer(conString)
 );
 

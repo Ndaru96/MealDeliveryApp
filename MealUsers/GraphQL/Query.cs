@@ -8,7 +8,7 @@ namespace UserService.GraphQL
     public class Query
     {
         [Authorize] // dapat diakses kalau sudah login
-        public IQueryable<User> GetUsers([Service] MealAppContext context, ClaimsPrincipal claimsPrincipal)
+        public IQueryable<User> GetUsers([Service] MealDeliveryContext context, ClaimsPrincipal claimsPrincipal)
         {
             var userName = claimsPrincipal.Identity.Name;
 
@@ -31,7 +31,7 @@ namespace UserService.GraphQL
         }
 
         [Authorize] // dapat diakses kalau sudah login
-        public IQueryable<Role> GetRole([Service] MealAppContext context, ClaimsPrincipal claimsPrincipal)
+        public IQueryable<Role> GetRole([Service] MealDeliveryContext context, ClaimsPrincipal claimsPrincipal)
         {
             var userName = claimsPrincipal.Identity.Name;
 
@@ -44,7 +44,7 @@ namespace UserService.GraphQL
                 {
                     return context.Roles;
                 }
-               
+
             }
 
 
@@ -52,7 +52,7 @@ namespace UserService.GraphQL
         }
 
         [Authorize] // dapat diakses kalau sudah login
-        public IQueryable<UserRole> GetUserRole([Service] MealAppContext context, ClaimsPrincipal claimsPrincipal)
+        public IQueryable<UserRole> GetUserRole([Service] MealDeliveryContext context, ClaimsPrincipal claimsPrincipal)
         {
             var userName = claimsPrincipal.Identity.Name;
 
@@ -74,21 +74,42 @@ namespace UserService.GraphQL
 
         [Authorize(Roles = new[] { "ADMIN" })]// dapat diakses kalau sudah login
         public IQueryable<UserRole> GetUserRoleByRoleId(
-            int id, [Service] MealAppContext context)
+            int id, [Service] MealDeliveryContext context)
         {
-         // check admin role ?
-            
+            // check admin role ?
+
             var user = context.UserRoles.Where(o => o.RoleId == id).FirstOrDefault();
             if (user != null)
 
-            { 
+            {
                 return context.UserRoles.Where(o => o.RoleId == id);
 
             }
-            
+
 
 
             return new List<UserRole>().AsQueryable();
         }
+
+        [Authorize] // dapat diakses kalau sudah login
+        public IQueryable<Courier> GetCourier([Service] MealDeliveryContext context, ClaimsPrincipal claimsPrincipal)
+        {
+            var userName = claimsPrincipal.Identity.Name;
+
+            // check admin role ?
+            var adminRole = claimsPrincipal.Claims.Where(o => o.Type == ClaimTypes.Role).FirstOrDefault();
+            var courier = context.Couriers.Where(o => o.Name == userName).FirstOrDefault();
+            if (courier != null)
+            {
+                if (adminRole.Value == "MANAGER")
+                {
+                    return context.Couriers;
+                }
+
+            }
+            return new List<Courier>().AsQueryable();
+        }
+       
     }
+
 }

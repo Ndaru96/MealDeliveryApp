@@ -1,4 +1,4 @@
-﻿namespace CourierService.GraphQL
+﻿namespace UserService.GraphQL
 {
     public record UpdateCourier
         (

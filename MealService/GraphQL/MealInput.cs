@@ -5,6 +5,6 @@
             int? Id,
             string Name,
             int Stock,
-            int Price
+            double Price
         );
 }

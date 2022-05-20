@@ -5,13 +5,13 @@ namespace OrderService.GraphQL
 {
     public class Mutation
     {
-        [Authorize(Roles = new[] { "MANAGER" })]
+        [Authorize(Roles = new[] { "BUYER" })]
         public async Task<OrderData> AddOrderAsync(
            OrderInput input,
-           [Service] MealAppContext context)
+           [Service] MealDeliveryContext context)
         {
-            var meal = context.Orders.Where(o => o.Id == input.Id).FirstOrDefault();
-            if (meal != null)
+            var order = context.Orders.Where(o => o.Id == input.Id).FirstOrDefault();
+            if (order != null)
             {
                 return await Task.FromResult(new OrderData());
             }
@@ -20,8 +20,9 @@ namespace OrderService.GraphQL
                 Code = input.Code,
                 UserId = input.UserId,
                 CourierId = input.CourierId,
-                StartDate = input.StartDate,
-                Status = input.Status,
+                Longitude = input.Longitude,
+                Latitude = input.Latitude,
+               
             };
 
             // EF
@@ -31,18 +32,19 @@ namespace OrderService.GraphQL
             return await Task.FromResult(new OrderData
             {
                 Id = newOrder.Id,
+                Code = newOrder.Code,
                 UserId = newOrder.UserId,
                 CourierId = newOrder.CourierId,
-                StartDate = newOrder.StartDate,
-                EndDate = newOrder.EndDate,
-                Status = newOrder.Status,
+                Longitude = newOrder.Longitude,
+                Latitude = newOrder.Latitude
+                
             });
         }
 
-        [Authorize(Roles = new[] { "MANAGER" })]
+        [Authorize(Roles = new[] { "BUYER" })]
         public async Task<OrderDetailData> AddOrderDetailAsync(
            OrderDetailInput input,
-           [Service] MealAppContext context)
+           [Service] MealDeliveryContext context)
         {
             var orderDetail = context.OrderDetails.Where(o => o.Id == input.Id).FirstOrDefault();
             if (orderDetail != null)
@@ -68,10 +70,10 @@ namespace OrderService.GraphQL
                 Quantity = newOrderDetail.Quantity
             });
         }
-        [Authorize(Roles = new[] { "MANAGER" })]
+        [Authorize(Roles = new[] { "BUYER" })]
         public async Task<Order> UpdateOrderAsync(
            UpdateOrder input,
-           [Service] MealAppContext context)
+           [Service] MealDeliveryContext context)
         {
             var order = context.Orders.Where(o => o.Id == input.Id).FirstOrDefault();
             if (order != null)
@@ -79,9 +81,8 @@ namespace OrderService.GraphQL
                 order.Code = input.Code;
                 order.UserId = input.UserId;
                 order.CourierId = input.CourierId;
-                order.StartDate = input.StartDate;
-                order.EndDate = input.EndDate;
-                order.Status = input.Status;
+                order.Longitude = input.Longitude;
+                order.Latitude = input.Latitude;
 
                 context.Orders.Update(order);
                 await context.SaveChangesAsync();
@@ -91,10 +92,10 @@ namespace OrderService.GraphQL
             return await Task.FromResult(order);
         }
 
-        [Authorize(Roles = new[] { "MANAGER" })]
+        [Authorize(Roles = new[] { "BUYER" })]
         public async Task<OrderDetail> UpdateOrderDetailAsync(
           UpdateOrderDetail input,
-          [Service] MealAppContext context)
+          [Service] MealDeliveryContext context)
         {
             var orderdetail = context.OrderDetails.Where(o => o.Id == input.Id).FirstOrDefault();
             if (orderdetail != null)
@@ -102,7 +103,7 @@ namespace OrderService.GraphQL
                 orderdetail.MealId = input.MealId;
                 orderdetail.OrderId = input.OrderId;
                 orderdetail.Quantity = input.Quantity;
-               
+
 
                 context.OrderDetails.Update(orderdetail);
                 await context.SaveChangesAsync();
@@ -110,6 +111,25 @@ namespace OrderService.GraphQL
 
 
             return await Task.FromResult(orderdetail);
+        }
+
+        [Authorize(Roles = new[] { "COURIER" })]
+        public async Task<Order> AddTrackingAsync(
+            OrderData input, int id,
+            [Service] MealDeliveryContext context)
+        {
+            var order = context.Orders.Where(o => o.Id == input.Id).FirstOrDefault();
+            if (order != null)
+            {
+                order.Longitude = input.Longitude;
+                order.Latitude = input.Latitude;
+
+                context.Orders.Update(order);
+                await context.SaveChangesAsync();
+            }
+
+            return await Task.FromResult(order);
+
         }
     }
 }

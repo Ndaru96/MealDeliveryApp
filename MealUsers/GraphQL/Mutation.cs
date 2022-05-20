@@ -1,4 +1,5 @@
 ﻿using HotChocolate.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,7 +15,7 @@ namespace UserService.GraphQL
 
         public async Task<UserData> RegisterUserAsync(
            RegisterUser input,
-           [Service] MealAppContext context)
+           [Service] MealDeliveryContext context)
         {
             var user = context.Users.Where(o => o.Username == input.UserName).FirstOrDefault();
             if (user != null)
@@ -23,7 +24,7 @@ namespace UserService.GraphQL
             }
             var newUser = new User
             {
-                Fullname = input.FullName,
+                FullName = input.FullName,
                 Email = input.Email,
                 Username = input.UserName,
                 Password = BCrypt.Net.BCrypt.HashPassword(input.Password) // encrypt password
@@ -38,14 +39,14 @@ namespace UserService.GraphQL
                 Id = newUser.Id,
                 Username = newUser.Username,
                 Email = newUser.Email,
-                FullName = newUser.Fullname
+                FullName = newUser.FullName
             });
         }
 
         public async Task<UserToken> LoginAsync(
             LoginUser input,
             [Service] IOptions<TokenSettings> tokenSettings, // setting token
-            [Service] MealAppContext context) // EF
+            [Service] MealDeliveryContext context) // EF
         {
             var user = context.Users.Where(o => o.Username == input.Username).FirstOrDefault();
             if (user == null)
@@ -94,14 +95,14 @@ namespace UserService.GraphQL
         [Authorize(Roles = new[] { "ADMIN" })]
         public async Task<User> UpdatePasswordAsync(
             ChangePassword input,
-            [Service] MealAppContext context)
+            [Service] MealDeliveryContext context)
         {
             var user = context.Users.Where(o => o.Id == input.Id).FirstOrDefault();
             if (user != null)
             {
                 user.Username = input.username;
                 user.Password = BCrypt.Net.BCrypt.HashPassword(input.password);
-               
+
 
                 context.Users.Update(user);
                 await context.SaveChangesAsync();
@@ -114,7 +115,7 @@ namespace UserService.GraphQL
         [Authorize]
         public async Task<ProfileData> AddProfileAsync(
             ProfileInput input,
-            [Service] MealAppContext context)
+            [Service] MealDeliveryContext context)
         {
             var profile = context.Profiles.Where(o => o.UserId == input.UserId).FirstOrDefault();
             if (profile != null)
@@ -125,6 +126,7 @@ namespace UserService.GraphQL
             var newProfile = new Profile
             {
                 UserId = input.UserId,
+                Name = input.Name,
                 Address = input.Address,
                 City = input.City,
                 Phone = input.Phone,
@@ -136,6 +138,7 @@ namespace UserService.GraphQL
             return await Task.FromResult(new ProfileData
             {
                 UserId = newProfile.UserId,
+                Name = newProfile.Name,
                 Address = newProfile.Address,
                 City = newProfile.City,
                 Phone = newProfile.Phone
@@ -150,9 +153,9 @@ namespace UserService.GraphQL
         [Authorize(Roles = new[] { "ADMIN" })]
         public async Task<User> DeleteUserByIdAsync(
            int id,
-           [Service] MealAppContext context)
+           [Service] MealDeliveryContext context)
         {
-            var product = context.Users.Where(o => o.Id == id).FirstOrDefault();
+            var product = context.Users.Where(o => o.Id == id).Include(s => s.UserRoles).Include(a => a.Profiles).Include(s => s.Orders).FirstOrDefault();
             if (product != null)
             {
                 context.Users.Remove(product);
@@ -163,10 +166,10 @@ namespace UserService.GraphQL
             return await Task.FromResult(product);
         }
 
-        [Authorize(Roles = new[] {"ADMIN"})]
+        [Authorize(Roles = new[] { "ADMIN" })]
         public async Task<UserRoleData> AddUserRoleAsync(
            UserRoleInput input,
-           [Service] MealAppContext context)
+           [Service] MealDeliveryContext context)
         {
             var userrole = context.UserRoles.Where(o => o.Id == input.Id).FirstOrDefault();
             if (userrole != null)
@@ -178,7 +181,7 @@ namespace UserService.GraphQL
             {
                 UserId = input.UserId,
                 RoleId = input.RoleId
-               
+
             };
 
             var ret = context.UserRoles.Add(newUserRole);
@@ -197,8 +200,39 @@ namespace UserService.GraphQL
 
         }
 
+        public async Task<CourierData> AddCourierAsync(
+          CourierInput input,
+          [Service] MealDeliveryContext context)
+        {
+            var courier = context.Couriers.Where(o => o.Name == input.Name).FirstOrDefault();
+            if (courier != null)
+            {
+                return await Task.FromResult(new CourierData());
+            }
+            var newCourier = new Courier
+            {
+                Name = input.Name,
+                Phone = input.Phone,
+                UserId = input.UserId
+               
+            };
+
+            // EF
+            var ret = context.Couriers.Add(newCourier);
+            await context.SaveChangesAsync();
+
+            return await Task.FromResult(new CourierData
+            {
+                Id = newCourier.Id,
+                Name = newCourier.Name,
+                Phone = newCourier.Phone,
+                UserId = newCourier.UserId
+                
+            });
+        }
+
+        
 
 
-
-    }
+     }
 }

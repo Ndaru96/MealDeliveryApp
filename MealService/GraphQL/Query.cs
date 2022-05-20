@@ -8,7 +8,7 @@ namespace MealService.GraphQL
     public class Query
     {
         [Authorize] // dapat diakses kalau sudah login
-        public IQueryable<Meal> GetMeals([Service] MealAppContext context, ClaimsPrincipal claimsPrincipal)
+        public IQueryable<Meal> GetMeals([Service] MealDeliveryContext context, ClaimsPrincipal claimsPrincipal)
         {
             var userName = claimsPrincipal.Identity.Name;
 
@@ -21,7 +21,7 @@ namespace MealService.GraphQL
                 {
                     return context.Meals;
                 }
-               
+
 
             }
 

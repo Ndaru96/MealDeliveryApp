@@ -6,9 +6,9 @@
             string Code,
             int UserId,
             int CourierId,
-            DateTime? StartDate,
-            DateTime? EndDate,
-            bool Status
+            string? Longitude,
+            string? Latitude
+            
         );
     
 }

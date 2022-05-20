@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace UserService.Models
 {
-    public partial class MealAppContext : DbContext
+    public partial class MealDeliveryContext : DbContext
     {
-        public MealAppContext()
+        public MealDeliveryContext()
         {
         }
 
-        public MealAppContext(DbContextOptions<MealAppContext> options)
+        public MealDeliveryContext(DbContextOptions<MealDeliveryContext> options)
             : base(options)
         {
         }
@@ -30,8 +30,8 @@ namespace UserService.Models
 //            if (!optionsBuilder.IsConfigured)
 //            {
 //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-//                optionsBuilder.UseSqlServer("Server=.\\NDARUAJI;Database=MealApp;uid=tester;pwd=123;");
-//            }
+//                optionsBuilder.UseSqlServer("Server=.\\NDARUAJI;Database=MealDelivery;uid=tester;pwd=123;");
+           //}
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -40,44 +40,50 @@ namespace UserService.Models
             {
                 entity.ToTable("Courier");
 
-                entity.Property(e => e.Name).HasMaxLength(50);
+                entity.Property(e => e.Name)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.Phone).HasMaxLength(50);
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.Couriers)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Courier_User1");
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Meal>(entity =>
             {
                 entity.ToTable("Meal");
 
-                entity.Property(e => e.Name).HasMaxLength(50);
+                entity.Property(e => e.Name)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Order>(entity =>
             {
                 entity.ToTable("Order");
 
-                entity.Property(e => e.Code).HasMaxLength(50);
+                entity.Property(e => e.Code)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.EndDate).HasColumnType("datetime");
+                entity.Property(e => e.Latitude)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.StartDate).HasColumnType("datetime");
+                entity.Property(e => e.Longitude)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.Courier)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.CourierId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Order_Courier");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Order_User");
             });
 
@@ -88,30 +94,40 @@ namespace UserService.Models
                 entity.HasOne(d => d.Meal)
                     .WithMany(p => p.OrderDetails)
                     .HasForeignKey(d => d.MealId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_OrderDetail_Meal");
 
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderDetails)
                     .HasForeignKey(d => d.OrderId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_OrderDetail_Order");
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_OrderId");
             });
 
             modelBuilder.Entity<Profile>(entity =>
             {
                 entity.ToTable("Profile");
 
-                entity.Property(e => e.Address).HasMaxLength(50);
+                entity.Property(e => e.Address)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.City).HasMaxLength(50);
+                entity.Property(e => e.City)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.Phone).HasMaxLength(50);
+                entity.Property(e => e.Name)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Profiles)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Profile_User");
             });
 
@@ -119,18 +135,28 @@ namespace UserService.Models
             {
                 entity.ToTable("Role");
 
-                entity.Property(e => e.Name).HasMaxLength(50);
+                entity.Property(e => e.Name)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("User");
 
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Email)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
-                entity.Property(e => e.Fullname).HasMaxLength(50);
+                entity.Property(e => e.FullName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Password).HasColumnType("ntext");
+
+                entity.Property(e => e.Username)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<UserRole>(entity =>
@@ -140,14 +166,14 @@ namespace UserService.Models
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.UserRoles)
                     .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserRole_Role");
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_Role");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.UserRoles)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_UserRole_User");
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_User");
             });
 
             OnModelCreatingPartial(modelBuilder);

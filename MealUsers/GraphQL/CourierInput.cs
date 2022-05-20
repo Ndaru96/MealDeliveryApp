@@ -1,4 +1,4 @@
-﻿namespace CourierService.GraphQL
+﻿namespace UserService.GraphQL
 {
     public record CourierInput
         (
@@ -6,6 +6,7 @@
             string Name,
             string Phone,
             int UserId
+            
         );
     
 }

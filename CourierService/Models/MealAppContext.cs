@@ -47,7 +47,7 @@ namespace CourierService.Models
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Couriers)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Courier_User1");
             });
 
@@ -71,13 +71,13 @@ namespace CourierService.Models
                 entity.HasOne(d => d.Courier)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.CourierId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Order_Courier");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Order_User");
             });
 
@@ -88,13 +88,13 @@ namespace CourierService.Models
                 entity.HasOne(d => d.Meal)
                     .WithMany(p => p.OrderDetails)
                     .HasForeignKey(d => d.MealId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_OrderDetail_Meal");
 
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderDetails)
                     .HasForeignKey(d => d.OrderId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_OrderDetail_Order");
             });
 
@@ -111,7 +111,7 @@ namespace CourierService.Models
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Profiles)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Profile_User");
             });
 
@@ -140,13 +140,13 @@ namespace CourierService.Models
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.UserRoles)
                     .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_UserRole_Role");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.UserRoles)
                     .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_UserRole_User");
             });
 
