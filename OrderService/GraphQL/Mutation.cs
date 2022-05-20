@@ -1,135 +1,154 @@
 ﻿using HotChocolate.AspNetCore.Authorization;
 using OrderService.Models;
+using System.Security.Claims;
 
 namespace OrderService.GraphQL
 {
     public class Mutation
     {
         [Authorize(Roles = new[] { "BUYER" })]
-        public async Task<OrderData> AddOrderAsync(
-           OrderInput input,
-           [Service] MealDeliveryContext context)
+        public async Task<Order> AddOrderAsync(
+           OrdersInput input,
+           [Service] MealDeliveryContext context, ClaimsPrincipal claimsPrincipal)
         {
-            var order = context.Orders.Where(o => o.Id == input.Id).FirstOrDefault();
-            if (order != null)
+            var username = claimsPrincipal.Identity.Name;
+            var user = context.Users.Where(o => o.Username == username).FirstOrDefault();
+            if (user != null)
             {
-                return await Task.FromResult(new OrderData());
+                var transaction = context.Database.BeginTransaction();
+                try
+                {
+                    var newOrder = new Order
+                    {
+                        Code = input.Code,
+                        UserId = user.Id,
+                        Longitude = input.Longitude,
+                        Latitude = input.Latitude,
+                        Status = false
+
+                    };
+                    for (int i = 0; i < input.OrderDetails.Count; i++)
+                    {
+                        var orderdetail = new OrderDetail
+                        {
+                            OrderId = newOrder.Id,
+                            MealId = input.OrderDetails[i].MealId,
+                            Quantity = input.OrderDetails[i].Quantity
+                        };
+                        newOrder.OrderDetails.Add(orderdetail);
+                    }
+                    // EF
+                    var ret = context.Orders.Add(newOrder);
+                    await context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return ret.Entity;
+                }
+                catch
+                {
+                    transaction.Rollback();
+                }
+
+
             }
-            var newOrder = new Order
-            {
-                Code = input.Code,
-                UserId = input.UserId,
-                CourierId = input.CourierId,
-                Longitude = input.Longitude,
-                Latitude = input.Latitude,
-               
-            };
 
-            // EF
-            var ret = context.Orders.Add(newOrder);
-            await context.SaveChangesAsync();
+            return new Order();
 
-            return await Task.FromResult(new OrderData
-            {
-                Id = newOrder.Id,
-                Code = newOrder.Code,
-                UserId = newOrder.UserId,
-                CourierId = newOrder.CourierId,
-                Longitude = newOrder.Longitude,
-                Latitude = newOrder.Latitude
-                
-            });
+
+
         }
 
-        [Authorize(Roles = new[] { "BUYER" })]
-        public async Task<OrderDetailData> AddOrderDetailAsync(
-           OrderDetailInput input,
-           [Service] MealDeliveryContext context)
-        {
-            var orderDetail = context.OrderDetails.Where(o => o.Id == input.Id).FirstOrDefault();
-            if (orderDetail != null)
-            {
-                return await Task.FromResult(new OrderDetailData());
-            }
-            var newOrderDetail = new OrderDetail
-            {
-                MealId = input.MealId,
-                OrderId = input.OrderId,
-                Quantity = input.Quantity
-            };
 
-            // EF
-            var ret = context.OrderDetails.Add(newOrderDetail);
-            await context.SaveChangesAsync();
 
-            return await Task.FromResult(new OrderDetailData
-            {
-                Id = newOrderDetail.Id,
-                MealId = newOrderDetail.MealId,
-                OrderId = newOrderDetail.OrderId,
-                Quantity = newOrderDetail.Quantity
-            });
-        }
-        [Authorize(Roles = new[] { "BUYER" })]
-        public async Task<Order> UpdateOrderAsync(
+        [Authorize(Roles = new[] { "MANAGER" })]
+        public async Task<Order> AddCourierAsync(
            UpdateOrder input,
            [Service] MealDeliveryContext context)
         {
             var order = context.Orders.Where(o => o.Id == input.Id).FirstOrDefault();
+            var courier = context.Couriers.Where(o => o.Id == input.CourierId).FirstOrDefault();
             if (order != null)
             {
-                order.Code = input.Code;
-                order.UserId = input.UserId;
-                order.CourierId = input.CourierId;
-                order.Longitude = input.Longitude;
-                order.Latitude = input.Latitude;
+                if (courier.Status == false)
+                {
+                    var transaction = context.Database.BeginTransaction();
+                    try
+                    {
+                        courier.Status = true;
+                        order.CourierId = input.CourierId;
 
-                context.Orders.Update(order);
-                await context.SaveChangesAsync();
+                        var ret = context.Orders.Update(order);
+                        await context.SaveChangesAsync();
+                        transaction.Commit();
+
+                        return ret.Entity;
+
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                    }
+                }
             }
-
-
-            return await Task.FromResult(order);
+            return new Order();
         }
-
-        [Authorize(Roles = new[] { "BUYER" })]
-        public async Task<OrderDetail> UpdateOrderDetailAsync(
-          UpdateOrderDetail input,
-          [Service] MealDeliveryContext context)
-        {
-            var orderdetail = context.OrderDetails.Where(o => o.Id == input.Id).FirstOrDefault();
-            if (orderdetail != null)
-            {
-                orderdetail.MealId = input.MealId;
-                orderdetail.OrderId = input.OrderId;
-                orderdetail.Quantity = input.Quantity;
-
-
-                context.OrderDetails.Update(orderdetail);
-                await context.SaveChangesAsync();
-            }
-
-
-            return await Task.FromResult(orderdetail);
-        }
+            
 
         [Authorize(Roles = new[] { "COURIER" })]
-        public async Task<Order> AddTrackingAsync(
-            OrderData input, int id,
-            [Service] MealDeliveryContext context)
+        public async Task<Order> UpdateOrderAsync(
+            LatesOrder input,
+            [Service] MealDeliveryContext context, ClaimsPrincipal claimsPrincipal)
         {
+            var userName = claimsPrincipal.Identity.Name;
+            var user = context.Users.Where(o => o.Username == userName).FirstOrDefault();
+
             var order = context.Orders.Where(o => o.Id == input.Id).FirstOrDefault();
-            if (order != null)
+
+            var courier = context.Couriers.Where(o => o.UserId == user.Id).FirstOrDefault();
+
+            if (order != null && order.CourierId == courier.Id)
             {
-                order.Longitude = input.Longitude;
-                order.Latitude = input.Latitude;
+                if (input.Status == true)
+                {
+                    var transaction = context.Database.BeginTransaction();
+                    try
+                    {
+                        order.Courier.Status = false;
+                        order.Status = input.Status;
+                        
 
-                context.Orders.Update(order);
-                await context.SaveChangesAsync();
+                        var ret = context.Orders.Update(order);
+                        await context.SaveChangesAsync();
+                        transaction.Commit();
+
+                        return ret.Entity;
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                    }
+                }
             }
-
-            return await Task.FromResult(order);
-
+            return new Order { CourierId = null, Code = "Null", Id = 0, UserId = 0 };
         }
+
+        //[Authorize(Roles = new[] { "MANAGER" })]
+        //public async Task<Order> DeleteOrderAsync(
+        //    int id,
+        //    [Service] MealDeliveryContext context)
+        //{
+        //    var order = context.Orders.Where(o => o.Id == id).Include(n => n.OrderDetails).FirstOrDefault();
+        //    if (order != null && order.Status == true)
+        //    {
+        //        //context.Orders.Remove(order);
+        //        //await context.SaveChangesAsync();
+        //        return new Order { CourierId = null, Code = "Terhapus", Id = 0, UserId = 0 };
+        //    }
+        //    else
+        //    {
+        //        return new Order { CourierId = null, Code = "Null", Id = 0, UserId = 0 };
+        //    }
+        //    return order;
+        //}
     }
 }

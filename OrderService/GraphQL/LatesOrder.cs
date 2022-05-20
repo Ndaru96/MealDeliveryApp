@@ -1,11 +1,9 @@
 ﻿namespace OrderService.GraphQL
 {
-    public record UpdateOrder
+    public record LatesOrder
         (
             int Id,
-            int CourierId
-           
-            
+            bool Status
         );
     
 }

@@ -214,7 +214,7 @@ namespace UserService.GraphQL
                 Name = input.Name,
                 Phone = input.Phone,
                 UserId = input.UserId
-               
+
             };
 
             // EF
@@ -227,12 +227,12 @@ namespace UserService.GraphQL
                 Name = newCourier.Name,
                 Phone = newCourier.Phone,
                 UserId = newCourier.UserId
-                
+
             });
         }
 
-        
 
 
-     }
+
+    }
 }

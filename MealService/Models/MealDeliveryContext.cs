@@ -77,7 +77,6 @@ namespace MealService.Models
                 entity.HasOne(d => d.Courier)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.CourierId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Order_Courier");
 
                 entity.HasOne(d => d.User)
@@ -100,7 +99,6 @@ namespace MealService.Models
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderDetails)
                     .HasForeignKey(d => d.OrderId)
-                    .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_OrderId");
             });
 
